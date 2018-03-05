@@ -1,5 +1,4 @@
-
-
+package sample;
 
 import java.io.*;
 import java.util.*;
@@ -13,8 +12,6 @@ public class spamDetector {
 
         TrainHamFreq = new TreeMap<>();
         TrainSpamFreq = new TreeMap <>();
-
-
     }
 
     public void processFile(File file) throws IOException {
@@ -42,6 +39,9 @@ public class spamDetector {
         }
     }
 
+    //public boolean isSpam(){
+
+    //}
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
         if (word.matches(pattern)) {
@@ -75,8 +75,7 @@ public class spamDetector {
         }
     }
 
-    public void outputWordCounts(int minCount, File outFile)
-            throws IOException {
+    public void outputWordCounts(int minCount, File outFile) throws IOException {
         System.out.println("Saving word counts to " + outFile.getAbsolutePath());
         System.out.println("# of words: " + TrainHamFreq.keySet().size());
         if (!outFile.exists()) {
@@ -84,29 +83,23 @@ public class spamDetector {
             if (outFile.canWrite()) {
                 PrintWriter fileOut = new PrintWriter(outFile);
 
-                Set<String> keys = TrainHamFreq.keySet();
-                Iterator<String> keyIterator = keys.iterator();
-                 Set<String> keyz = TrainSpamFreq.keySet();
-                 Iterator<String> keyIterators = keyz.iterator();
+                Set<String> hamKeys = TrainHamFreq.keySet();
+                Iterator<String> keyIterator = hamKeys.iterator();
+                Set<String> spamKeys = TrainSpamFreq.keySet();
+                Iterator<String> keyIterators = spamKeys.iterator();
 
                 while (keyIterator.hasNext()) {
 
-                    String key = keyIterator.next();
-                      String keyzz= keyIterators.next();
-                      int counts = TrainSpamFreq.get(keyzz);
-                    int count = TrainHamFreq.get(key);
+                    String hamIterator = keyIterator.next();
+                    String spamIterator = keyIterators.next();
+                    int spamCounts = TrainSpamFreq.get(spamIterator);
+                    int hamCounts = TrainHamFreq.get(hamIterator);
 
-                    if (count >= minCount) {
-                        fileOut.println("ham file "+ key + ": " + count);
-
-                          fileOut.println("spam file "+ keyzz + ": "+ counts);
-                        fileOut.println(" ");
-
+                    if (hamCounts >= minCount) {
+                        fileOut.println("ham file "+ hamIterator + ": " + hamCounts);
+                        fileOut.println("spam file "+ spamIterator + ": "+ spamCounts);
                     }
                 }
-
-
-
                 fileOut.close();
             } else {
                 System.err.println("Error:  Cannot write to file: " + outFile.getAbsolutePath());
@@ -117,10 +110,6 @@ public class spamDetector {
             System.out.println("outFile.canWrite(): " + outFile.canWrite());
         }
     }
-
-
-
-
 
     public static void main(String[] args) {
         if (args.length < 2) {
