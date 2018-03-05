@@ -1,10 +1,10 @@
-package sample;
 
 import java.io.*;
 import java.util.*;
 
 public class spamDetector {
-
+    double Accuracy;
+    double Precision;
     private Map<String,Integer> TrainHamFreq;
     private Map<String,Integer> TrainSpamFreq;
 
@@ -39,9 +39,7 @@ public class spamDetector {
         }
     }
 
-    //public boolean isSpam(){
 
-    //}
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
         if (word.matches(pattern)) {
@@ -53,6 +51,56 @@ public class spamDetector {
         // also fine:
         //return word.matches(pattern);
     }
+
+    private Map<String,Double> HamFreq;
+    private Map<String,Double> SpamFreq;
+
+    public Map word_ham_probabilty()
+    {
+        for (Map.Entry<String, Integer> entry : TrainHamFreq.entrySet()) {
+       // HamFreq = (TrainHamFreq/
+        }
+        return HamFreq;
+    }
+
+    public Map word_spam_probability(){ return SpamFreq ;}
+
+
+
+
+    private void PrecisionAndAccuracy(){
+        double numCorrectGuesses = 0;
+        double numGuesses = 0;
+        double numTrueNegatives= 0;
+        double numFiles = TrainHamFreq.size() + TrainSpamFreq.size() ;
+        double numTruePositives= 0;
+        double numFalsePositives= 0;
+
+//Calculate for True Postivies
+
+        this.Accuracy = (numTruePositives + numTrueNegatives)/ numFiles;
+        this.Precision = numTruePositives / numFalsePositives + numTruePositives;
+    }
+
+
+    public void Test(){
+   /*
+    int value;
+    for(File current: contents){
+    value +=(Math.log(//p(wsw) - math.log(pr(s|w))))
+    }
+    */
+        double psf;
+        double x = 0;
+        psf = 1/ (1+ Math.pow(Math.E,x));
+
+
+    }
+
+
+
+
+
 
     private void countWord(String word,String filename) {
         String ham= "ham";
