@@ -1,4 +1,4 @@
-package sample;
+
 
 
 import java.io.*;
@@ -86,19 +86,20 @@ public class spamDetector {
 
                 Set<String> keys = TrainHamFreq.keySet();
                 Iterator<String> keyIterator = keys.iterator();
-                // Set<String> keyz = TrainSpamFreq.keySet();
-                // Iterator<String> keyIterators = keyz.iterator();
+                 Set<String> keyz = TrainSpamFreq.keySet();
+                 Iterator<String> keyIterators = keyz.iterator();
 
                 while (keyIterator.hasNext()) {
 
                     String key = keyIterator.next();
-                    //  String keyzz= keyIterators.next();
-                    //  int counts = TrainSpamFreq.get(keyzz);
+                      String keyzz= keyIterators.next();
+                      int counts = TrainSpamFreq.get(keyzz);
                     int count = TrainHamFreq.get(key);
 
                     if (count >= minCount) {
-                        fileOut.println(key + ": " + count);
-                        //  fileOut.print(keyzz + ": "+ counts);
+                        fileOut.println("ham file "+ key + ": " + count);
+                        fileOut.println(" ");
+                          fileOut.println("spam file "+ keyzz + ": "+ counts);
 
                     }
                 }
@@ -116,6 +117,10 @@ public class spamDetector {
         }
     }
 
+
+
+
+
     public static void main(String[] args) {
         if (args.length < 2) {
             System.err.println("Usage: java WordCounter <dir> <outfile>");
@@ -129,6 +134,7 @@ public class spamDetector {
         try {
             spamDetector.processFile(dataDir);
             spamDetector.outputWordCounts(2, outFile);
+
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
