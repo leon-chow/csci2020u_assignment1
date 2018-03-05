@@ -1,3 +1,4 @@
+package sample;
 
 import java.io.*;
 import java.util.*;
@@ -5,21 +6,26 @@ import java.util.*;
 public class spamDetector {
     double Accuracy;
     double Precision;
+    public int numberOfSpamFiles = 0;
+    public int numberOfHamFiles = 0;
     private Map<String,Integer> TrainHamFreq;
     private Map<String,Integer> TrainSpamFreq;
 
     public spamDetector() {
-
-        TrainHamFreq = new TreeMap<>();
+        TrainHamFreq = new TreeMap <>();
         TrainSpamFreq = new TreeMap <>();
     }
 
     public void processFile(File file) throws IOException {
         System.out.println("Processing " + file.getAbsolutePath() + "...");
         if (file.isDirectory()) {
-            // process all the files in that directory
             File[] contents = file.listFiles();
             for (File current: contents) {
+                if (current.getParentFile().getName().equals("spam")) {
+                    numberOfSpamFiles += 1;
+                } else if (current.getParentFile().getName().equals("ham")) {
+                    numberOfHamFiles += 1;
+                }
                 processFile(current);
             }
         } else if (file.exists()) {
@@ -39,6 +45,23 @@ public class spamDetector {
         }
     }
 
+    /*public int spamFileProbability() {
+        wordHamProbability();
+        spamHamProbability();
+
+
+    } */
+
+
+    public void wordHamProbability(){
+        Map <String,Double> HamFreq;
+        Map <String,Double> SpamFreq;
+        for (Map.Entry<String, Integer> entry : TrainSpamFreq.entrySet()) {
+            System.out.println("testing");
+        }
+    }
+
+    //public Map word_spam_probability(){ return SpamFreq ;}
 
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
@@ -47,26 +70,7 @@ public class spamDetector {
         } else {
             return false;
         }
-
-        // also fine:
-        //return word.matches(pattern);
     }
-
-    private Map<String,Double> HamFreq;
-    private Map<String,Double> SpamFreq;
-
-    public Map word_ham_probabilty()
-    {
-        for (Map.Entry<String, Integer> entry : TrainHamFreq.entrySet()) {
-       // HamFreq = (TrainHamFreq/
-        }
-        return HamFreq;
-    }
-
-    public Map word_spam_probability(){ return SpamFreq ;}
-
-
-
 
     private void PrecisionAndAccuracy(){
         double numCorrectGuesses = 0;
@@ -93,14 +97,7 @@ public class spamDetector {
         double psf;
         double x = 0;
         psf = 1/ (1+ Math.pow(Math.E,x));
-
-
     }
-
-
-
-
-
 
     private void countWord(String word,String filename) {
         String ham= "ham";
@@ -111,8 +108,7 @@ public class spamDetector {
             } else {
                 TrainHamFreq.put(word, 1);
             }
-        }
-        else{
+        } else {
             if (TrainSpamFreq.containsKey(word)) {
                 int oldCount = TrainSpamFreq.get(word);
                 TrainSpamFreq.put(word, oldCount + 1);
@@ -172,7 +168,7 @@ public class spamDetector {
         try {
             spamDetector.processFile(dataDir);
             spamDetector.outputWordCounts(2, outFile);
-
+            spamDetector.wordHamProbability();
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
