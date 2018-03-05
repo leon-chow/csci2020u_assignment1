@@ -98,8 +98,9 @@ public class spamDetector {
 
                     if (count >= minCount) {
                         fileOut.println("ham file "+ key + ": " + count);
-                        fileOut.println(" ");
+
                           fileOut.println("spam file "+ keyzz + ": "+ counts);
+                        fileOut.println(" ");
 
                     }
                 }
