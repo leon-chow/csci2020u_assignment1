@@ -4,12 +4,12 @@ package sample;
 import java.io.*;
 import java.util.*;
 
-public class WordCounter {
+public class spamDetector {
 
     private Map<String,Integer> TrainHamFreq;
     private Map<String,Integer> TrainSpamFreq;
 
-    public WordCounter() {
+    public spamDetector() {
 
         TrainHamFreq = new TreeMap<>();
         TrainSpamFreq = new TreeMap <>();
@@ -27,12 +27,16 @@ public class WordCounter {
             }
         } else if (file.exists()) {
             // count the words in this file
+            Set<String> words = new TreeSet<>();
             Scanner scanner = new Scanner(file);
             scanner.useDelimiter("\\s");//"[\s\.;:\?\!,]");//" \t\n.;,!?-/\\");
             while (scanner.hasNext()) {
                 String word = scanner.next();
                 if (isWord(word)) {
-                    countWord(word,file.getParent());
+                    if (!words.contains(word)) {
+                        countWord(word);
+                        words.add(word);
+                    }
                 }
             }
         }
@@ -45,9 +49,6 @@ public class WordCounter {
         } else {
             return false;
         }
-
-        // also fine:
-        //return word.matches(pattern);
     }
 
     private void countWord(String word,String filename) {
@@ -118,13 +119,13 @@ public class WordCounter {
             System.exit(0);
         }
 
-        WordCounter wordCounter = new WordCounter();
+        spamDetector spamDetector = new spamDetector();
         File dataDir = new File(args[0]);
         File outFile = new File(args[1]);
 
         try {
-            wordCounter.processFile(dataDir);
-            wordCounter.outputWordCounts(2, outFile);
+            spamDetector.processFile(dataDir);
+            spamDetector.outputWordCounts(2, outFile);
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
