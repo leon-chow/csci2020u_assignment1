@@ -21,21 +21,21 @@ public class spamDetector {
         System.out.println("Processing " + file.getAbsolutePath() + "...");
         if (file.isDirectory()) {
             // process all the files in that directory
-             File[] contents = file.listFiles();
+            File[] contents = file.listFiles();
             for (File current: contents) {
                 processFile(current);
             }
         } else if (file.exists()) {
             // count the words in this file
-            Set<String> words = new TreeSet<>();
             Scanner scanner = new Scanner(file);
+            Set<String> words = new TreeSet<>();
             scanner.useDelimiter("\\s");//"[\s\.;:\?\!,]");//" \t\n.;,!?-/\\");
             while (scanner.hasNext()) {
                 String word = scanner.next();
                 if (isWord(word)) {
                     if (!words.contains(word)) {
-                        countWord(word);
                         words.add(word);
+                        countWord(word,file.getParent());
                     }
                 }
             }
@@ -49,6 +49,9 @@ public class spamDetector {
         } else {
             return false;
         }
+
+        // also fine:
+        //return word.matches(pattern);
     }
 
     private void countWord(String word,String filename) {
@@ -83,19 +86,19 @@ public class spamDetector {
 
                 Set<String> keys = TrainHamFreq.keySet();
                 Iterator<String> keyIterator = keys.iterator();
-               // Set<String> keyz = TrainSpamFreq.keySet();
-               // Iterator<String> keyIterators = keyz.iterator();
+                // Set<String> keyz = TrainSpamFreq.keySet();
+                // Iterator<String> keyIterators = keyz.iterator();
 
                 while (keyIterator.hasNext()) {
 
                     String key = keyIterator.next();
-                  //  String keyzz= keyIterators.next();
-                  //  int counts = TrainSpamFreq.get(keyzz);
+                    //  String keyzz= keyIterators.next();
+                    //  int counts = TrainSpamFreq.get(keyzz);
                     int count = TrainHamFreq.get(key);
 
                     if (count >= minCount) {
                         fileOut.println(key + ": " + count);
-                      //  fileOut.print(keyzz + ": "+ counts);
+                        //  fileOut.print(keyzz + ": "+ counts);
 
                     }
                 }
