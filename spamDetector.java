@@ -1,7 +1,7 @@
 package sample;
 
-        import java.io.*;
-        import java.util.*;
+import java.io.*;
+import java.util.*;
 
 public class spamDetector {
     double Accuracy;
@@ -66,7 +66,6 @@ public class spamDetector {
             }
         }
     }
-            //public Map word_spam_probability(){ return SpamFreq ;}
 
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
@@ -85,7 +84,7 @@ public class spamDetector {
         double numTruePositives= 0;
         double numFalsePositives= 0;
 
-//Calculate for True Postivies
+        //Calculate for True Postivies
 
         this.Accuracy = (numTruePositives + numTrueNegatives)/ numFiles;
         this.Precision = numTruePositives / numFalsePositives + numTruePositives;
