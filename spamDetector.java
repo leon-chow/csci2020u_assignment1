@@ -1,13 +1,13 @@
 package sample;
 
-import java.io.*;
-import java.util.*;
+        import java.io.*;
+        import java.util.*;
 
 public class spamDetector {
     double Accuracy;
     double Precision;
-    public int numberOfSpamFiles = 0;
-    public int numberOfHamFiles = 0;
+    public double numberOfSpamFiles = 0;
+    public double numberOfHamFiles = 0;
     private Map<String,Integer> TrainHamFreq;
     private Map<String,Integer> TrainSpamFreq;
 
@@ -16,7 +16,7 @@ public class spamDetector {
         TrainSpamFreq = new TreeMap <>();
     }
 
-    public void processFile(File file) throws IOException {
+    public void trainSpamDetector(File file) throws IOException {
         System.out.println("Processing " + file.getAbsolutePath() + "...");
         if (file.isDirectory()) {
             File[] contents = file.listFiles();
@@ -26,7 +26,7 @@ public class spamDetector {
                 } else if (current.getParentFile().getName().equals("ham")) {
                     numberOfHamFiles += 1;
                 }
-                processFile(current);
+                trainSpamDetector(current);
             }
         } else if (file.exists()) {
             // count the words in this file
@@ -45,23 +45,28 @@ public class spamDetector {
         }
     }
 
-    /*public int spamFileProbability() {
-        wordHamProbability();
-        spamHamProbability();
+    public void spamProbability() {
+        Map<String, Double> spamProb = new TreeMap<>();
+        Map<String, Double> hamProb = new TreeMap<>();
+        Map<String, Double> fileIsSpamProb = new TreeMap<>();
 
-
-    } */
-
-
-    public void wordHamProbability(){
-        Map <String,Double> HamFreq;
-        Map <String,Double> SpamFreq;
         for (Map.Entry<String, Integer> entry : TrainSpamFreq.entrySet()) {
-            System.out.println("testing");
+            spamProb.put(entry.getKey(), (double)entry.getValue()/numberOfSpamFiles);
+        }
+
+        for (Map.Entry<String, Integer> entry: TrainHamFreq.entrySet()) {
+            hamProb.put(entry.getKey(), (double)entry.getValue()/numberOfHamFiles);
+        }
+
+        for (Map.Entry<String, Double> entry: spamProb.entrySet()) {
+            if (hamProb.containsKey(entry.getKey())) {
+                fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue() + hamProb.get(entry.getKey())));
+            } else {
+                fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue()));
+            }
         }
     }
-
-    //public Map word_spam_probability(){ return SpamFreq ;}
+            //public Map word_spam_probability(){ return SpamFreq ;}
 
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
@@ -115,7 +120,6 @@ public class spamDetector {
             } else {
                 TrainSpamFreq.put(word, 1);
             }
-
         }
     }
 
@@ -128,14 +132,14 @@ public class spamDetector {
                 PrintWriter fileOut = new PrintWriter(outFile);
 
                 Set<String> hamKeys = TrainHamFreq.keySet();
-                Iterator<String> keyIterator = hamKeys.iterator();
+                Iterator<String> hamKeyIterator = hamKeys.iterator();
                 Set<String> spamKeys = TrainSpamFreq.keySet();
-                Iterator<String> keyIterators = spamKeys.iterator();
+                Iterator<String> spamKeyIterators = spamKeys.iterator();
 
-                while (keyIterator.hasNext()) {
+                while (hamKeyIterator.hasNext()) {
 
-                    String hamIterator = keyIterator.next();
-                    String spamIterator = keyIterators.next();
+                    String hamIterator = hamKeyIterator.next();
+                    String spamIterator = spamKeyIterators.next();
                     int spamCounts = TrainSpamFreq.get(spamIterator);
                     int hamCounts = TrainHamFreq.get(hamIterator);
 
@@ -166,9 +170,9 @@ public class spamDetector {
         File outFile = new File(args[1]);
 
         try {
-            spamDetector.processFile(dataDir);
-            spamDetector.outputWordCounts(2, outFile);
-            spamDetector.wordHamProbability();
+            spamDetector.trainSpamDetector(dataDir);
+            spamDetector.outputWordCounts(1, outFile);
+            spamDetector.spamProbability();
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
