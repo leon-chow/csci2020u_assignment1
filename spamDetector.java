@@ -45,28 +45,6 @@ public class spamDetector {
         }
     }
 
-    public void spamProbability() {
-        Map<String, Double> spamProb = new TreeMap<>();
-        Map<String, Double> hamProb = new TreeMap<>();
-        Map<String, Double> fileIsSpamProb = new TreeMap<>();
-
-        for (Map.Entry<String, Integer> entry : TrainSpamFreq.entrySet()) {
-            spamProb.put(entry.getKey(), (double)entry.getValue()/numberOfSpamFiles);
-        }
-
-        for (Map.Entry<String, Integer> entry: TrainHamFreq.entrySet()) {
-            hamProb.put(entry.getKey(), (double)entry.getValue()/numberOfHamFiles);
-        }
-
-        for (Map.Entry<String, Double> entry: spamProb.entrySet()) {
-            if (hamProb.containsKey(entry.getKey())) {
-                fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue() + hamProb.get(entry.getKey())));
-            } else {
-                fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue()));
-            }
-        }
-    }
-
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
         if (word.matches(pattern)) {
@@ -74,33 +52,6 @@ public class spamDetector {
         } else {
             return false;
         }
-    }
-
-    private void PrecisionAndAccuracy(){
-        double numCorrectGuesses = 0;
-        double numGuesses = 0;
-        double numTrueNegatives= 0;
-        double numFiles = TrainHamFreq.size() + TrainSpamFreq.size() ;
-        double numTruePositives= 0;
-        double numFalsePositives= 0;
-
-        //Calculate for True Postivies
-
-        this.Accuracy = (numTruePositives + numTrueNegatives)/ numFiles;
-        this.Precision = numTruePositives / numFalsePositives + numTruePositives;
-    }
-
-
-    public void Test(){
-   /*
-    int value;
-    for(File current: contents){
-    value +=(Math.log(//p(wsw) - math.log(pr(s|w))))
-    }
-    */
-        double psf;
-        double x = 0;
-        psf = 1/ (1+ Math.pow(Math.E,x));
     }
 
     private void countWord(String word,String filename) {
@@ -132,11 +83,11 @@ public class spamDetector {
 
                 Set<String> hamKeys = TrainHamFreq.keySet();
                 Iterator<String> hamKeyIterator = hamKeys.iterator();
+                
                 Set<String> spamKeys = TrainSpamFreq.keySet();
                 Iterator<String> spamKeyIterators = spamKeys.iterator();
 
                 while (hamKeyIterator.hasNext()) {
-
                     String hamIterator = hamKeyIterator.next();
                     String spamIterator = spamKeyIterators.next();
                     int spamCounts = TrainSpamFreq.get(spamIterator);
@@ -158,6 +109,54 @@ public class spamDetector {
         }
     }
 
+    public void spamProbability() {
+        Map<String, Double> spamProb = new TreeMap<>();
+        Map<String, Double> hamProb = new TreeMap<>();
+        Map<String, Double> fileIsSpamProb = new TreeMap<>();
+
+        for (Map.Entry<String, Integer> entry : TrainSpamFreq.entrySet()) {
+            spamProb.put(entry.getKey(), (double)entry.getValue()/numberOfSpamFiles);
+        }
+
+        for (Map.Entry<String, Integer> entry: TrainHamFreq.entrySet()) {
+            hamProb.put(entry.getKey(), (double)entry.getValue()/numberOfHamFiles);
+        }
+
+        for (Map.Entry<String, Double> entry: spamProb.entrySet()) {
+            if (hamProb.containsKey(entry.getKey())) {
+                fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue() + hamProb.get(entry.getKey())));
+            } else {
+                fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue()));
+            }
+        }
+    }
+
+    private void precisionAndAccuracy(){
+        double numCorrectGuesses = 0;
+        double numGuesses = 0;
+        double numTrueNegatives= 0;
+        double numFiles = TrainHamFreq.size() + TrainSpamFreq.size() ;
+        double numTruePositives= 0;
+        double numFalsePositives= 0;
+
+    //Calculate for True Postivies
+
+        this.Accuracy = (numTruePositives + numTrueNegatives)/ numFiles;
+        this.Precision = numTruePositives / numFalsePositives + numTruePositives;
+    }
+
+    public void test(){
+   /*
+    int value;
+    for(File current: contents){
+    value +=(Math.log(//p(wsw) - math.log(pr(s|w))))
+    }
+    */
+        double psf;
+        double x = 0;
+        psf = 1/ (1+ Math.pow(Math.E,x));
+    }
+
     public static void main(String[] args) {
         if (args.length < 2) {
             System.err.println("Usage: java WordCounter <dir> <outfile>");
@@ -170,8 +169,9 @@ public class spamDetector {
 
         try {
             spamDetector.trainSpamDetector(dataDir);
-            spamDetector.outputWordCounts(1, outFile);
             spamDetector.spamProbability();
+            spamDetector.outputWordCounts(1, outFile);
+            spamDetector.test();
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
