@@ -1,10 +1,18 @@
+//Leon Chow 100617197, Bevan Donbosco(100618701), (100637553)
+//we were able to  spam probabilities of each word, counting the words,
+//counting the number of ham and spam files, we generated the table in the
+//main.java
+//However, we did not test the probabilities of each file and classify programs
+//as ham or spam
 package sample;
 
+//import following libraries
 import java.io.*;
 import java.util.*;
 import java.lang.Math;
 
 public class spamDetector {
+    //variables and maps definition
     double Accuracy;
     double Precision;
     public double numberOfSpamFiles = 0;
@@ -14,11 +22,13 @@ public class spamDetector {
     private Map<String, Double> fileIsSpamProb;
 
     public spamDetector() {
+        //initializing maps
         TrainHamFreq = new TreeMap <>();
         TrainSpamFreq = new TreeMap <>();
         fileIsSpamProb = new TreeMap <>();
     }
 
+    //goes through each of the file in the folder, incrementing ham or spam file counter
     public void trainSpamDetector(File file) throws IOException {
         System.out.println("Processing " + file.getAbsolutePath() + "...");
         if (file.isDirectory()) {
@@ -31,6 +41,7 @@ public class spamDetector {
                 }
                 trainSpamDetector(current);
             }
+            //checks to see if the file exists
         } else if (file.exists()) {
             // count the words in this file
             Scanner scanner = new Scanner(file);
@@ -39,6 +50,7 @@ public class spamDetector {
             while (scanner.hasNext()) {
                 String word = scanner.next();
                 if (isWord(word)) {
+                    //unique entries in the file and adds it to the map once
                     if (!words.contains(word)) {
                         words.add(word);
                         countWord(word,file.getParent());
@@ -48,6 +60,7 @@ public class spamDetector {
         }
     }
 
+    //checks to see if the combination of characters is a word
     private boolean isWord(String word) {
         String pattern = "^[a-zA-Z]+$";
         if (word.matches(pattern)) {
@@ -57,6 +70,8 @@ public class spamDetector {
         }
     }
 
+    //counts the number of files the word appears in, seperating the words FileNotFoundException
+    //ham or spam categories
     private void countWord(String word,String filename) {
         String ham= "ham";
         if (filename.toLowerCase().indexOf(ham.toLowerCase()) != -1) {
@@ -76,6 +91,7 @@ public class spamDetector {
         }
     }
 
+    //displays the word count to the user and the outfile
     public void outputWordCounts(int minCount, File outFile) throws IOException {
         System.out.println("Saving word counts to " + outFile.getAbsolutePath());
         System.out.println("# of words: " + TrainHamFreq.keySet().size());
@@ -84,18 +100,21 @@ public class spamDetector {
             if (outFile.canWrite()) {
                 PrintWriter fileOut = new PrintWriter(outFile);
 
+                //initializing the maps
                 Set<String> hamKeys = TrainHamFreq.keySet();
                 Iterator<String> hamKeyIterator = hamKeys.iterator();
 
                 Set<String> spamKeys = TrainSpamFreq.keySet();
                 Iterator<String> spamKeyIterators = spamKeys.iterator();
 
+                //iterates through each word and displays the word count and word in another file
                 while (hamKeyIterator.hasNext()) {
                     String hamIterator = hamKeyIterator.next();
                     String spamIterator = spamKeyIterators.next();
                     int spamCounts = TrainSpamFreq.get(spamIterator);
                     int hamCounts = TrainHamFreq.get(hamIterator);
 
+                    //displays the word and the number of files it appears in
                     if (hamCounts >= minCount) {
                         fileOut.println("ham file "+ hamIterator + ": " + hamCounts);
                         fileOut.println("spam file "+ spamIterator + ": "+ spamCounts);
@@ -112,19 +131,24 @@ public class spamDetector {
         }
     }
 
+    //checks the probability of the file being spam if given the word
     public Map spamProbability() {
+        //initializing the maps
         Map<String, Double> spamProb = new TreeMap<>();
         Map<String, Double> hamProb = new TreeMap<>();
         Map<String, Double> fileIsSpamProb = new TreeMap<>();
 
+        //map to check the spam probability of the word
         for (Map.Entry<String, Integer> entry : TrainSpamFreq.entrySet()) {
             spamProb.put(entry.getKey(), (double)entry.getValue()/numberOfSpamFiles);
         }
 
+        //map to check the ham probability of the word
         for (Map.Entry<String, Integer> entry: TrainHamFreq.entrySet()) {
             hamProb.put(entry.getKey(), (double)entry.getValue()/numberOfHamFiles);
         }
 
+        //map to check if the file is probability given that it contains the word
         for (Map.Entry<String, Double> entry: spamProb.entrySet()) {
             if (hamProb.containsKey(entry.getKey())) {
                 fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue() + hamProb.get(entry.getKey())));
@@ -132,9 +156,11 @@ public class spamDetector {
                 fileIsSpamProb.put(entry.getKey(), entry.getValue()/(entry.getValue()));
             }
         }
+        //returns the map to be used in another function
         return fileIsSpamProb;
     }
 
+    //ths function is suposed to check the precision and accuracy of the program
     private void precisionAndAccuracy(){
         double numCorrectGuesses = 0;
         double numGuesses = 0;
@@ -149,6 +175,7 @@ public class spamDetector {
         this.Precision = numTruePositives / numFalsePositives + numTruePositives;
     }
 
+    //this function is supposed to spam detect the test ham and spam files
    /*public void test(File file, Map<String, Double> fileIsSpamProb) throws IOException {
         if (file.isDirectory()) {
             File[] contents = file.listFiles();
@@ -170,23 +197,26 @@ public class spamDetector {
         }
     } */
 
+    //main function
     public static void main(String[] args) {
         if (args.length < 2) {
             System.err.println("Usage: java WordCounter <dir> <outfile>");
             System.exit(0);
         }
 
+        //new spamDetector object
         spamDetector spamDetector = new spamDetector();
         File dataDir = new File(args[0]);
         File outFile = new File(args[1]);
-        File testDir = new File(args[2]);
 
         try {
+            //generates a map and trains the file to detect spam
             spamDetector.trainSpamDetector(dataDir);
             spamDetector.spamProbability();
             Map<String, Double> fileIsSpamProb = spamDetector.spamProbability();
             spamDetector.outputWordCounts(1, outFile);
             //spamDetector.test(testDir, fileIsSpamProb);
+        //error detector
         } catch (FileNotFoundException e) {
             System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
             e.printStackTrace();
