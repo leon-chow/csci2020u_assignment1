@@ -1,7 +1,7 @@
 //Leon Chow 100617197, Bevan Donbosco(100618701), (100637553)
 //we were able to  spam probabilities of each word, counting the words,
 //counting the number of ham and spam files, we generated the table in the
-//main.java
+//main.java file
 //However, we did not test the probabilities of each file and classify programs
 //as ham or spam
 package sample;
