@@ -20,10 +20,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        //Setting the title to the assignment
         primaryStage.setTitle("Assignment 1");
 
         BorderPane layout = new BorderPane();
-
+        //creating the table column
         TableColumn<Spam, Float> File = new TableColumn<>("File");
         File.setPrefWidth(100);
         File.setCellValueFactory(new PropertyValueFactory<>("File"));
@@ -50,21 +51,19 @@ public class Main extends Application {
 
 
 
-
+        //Creating the text boxes
         Label assignment = new Label("Accuracy ");
-        //editArea.add(assignment, 3, 1);
         HamField = new TextField();
         HamField.setPromptText("Accuracy");
         editArea.add(HamField, 4, 1);
 
         Label exam = new Label("Precision ");
-        //editArea.add(exam, 3, 2);
         SpamProbField = new TextField();
         SpamProbField.setPromptText("Precision");
         editArea.add(SpamProbField, 4, 2);
 
         Button addButton = new Button("Find");
-        //editArea.add(addButton, 0, 4);
+        //setting the action event handler
         addButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event){
